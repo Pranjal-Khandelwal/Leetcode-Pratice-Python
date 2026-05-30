@@ -1,1 +1,118 @@
+#### Approach-1:Recursive Code ######
 
+class Solution:
+    def subsetSum(self, nums, target, n):
+        # Base Cases
+        if target == 0:
+            return True
+
+        if n == 0:
+            return False
+
+        # Choice Diagram
+        if nums[n - 1] <= target:
+            return (
+                self.subsetSum(nums, target - nums[n - 1], n - 1)
+                or
+                self.subsetSum(nums, target, n - 1)
+            )
+
+        return self.subsetSum(nums, target, n - 1)
+
+    def canPartition(self, nums):
+        total = sum(nums)
+
+        if total % 2 != 0:
+            return False
+
+        return self.subsetSum(nums, total // 2, len(nums))
+
+
+#### Approach-2:Top-Down-Memoization Code ######
+
+class Solution:
+    def subsetSum(self, nums, target, n, dp):
+        # Base Cases
+        if target == 0:
+            return True
+
+        if n == 0:
+            return False
+
+        if dp[n][target] != -1:
+            return dp[n][target]
+
+        # Choice Diagram
+        if nums[n - 1] <= target:
+            dp[n][target] = (
+                self.subsetSum(nums, target - nums[n - 1], n - 1, dp)
+                or
+                self.subsetSum(nums, target, n - 1, dp)
+            )
+        else:
+            dp[n][target] = self.subsetSum(
+                nums, target, n - 1, dp
+            )
+
+        return dp[n][target]
+
+    def canPartition(self, nums):
+        total = sum(nums)
+
+        if total % 2 != 0:
+            return False
+
+        target = total // 2
+        n = len(nums)
+
+        dp = [[-1 for _ in range(target + 1)]
+              for _ in range(n + 1)]
+
+        return self.subsetSum(nums, target, n, dp)
+
+
+
+
+#### Approach-3: Bottom down Code ######
+
+class Solution:
+    def subsetSum(self,nums,target_sum,n,dp)->bool:
+        # Initialization
+        for i in range(n + 1):
+            dp[i][0] = True
+
+        for j in range(1, target_sum + 1):
+            dp[0][j] = False
+
+        # Fill table
+        for i in range(1, n + 1):
+            for j in range(1, target_sum + 1):
+                if nums[i - 1] <= j:
+                    dp[i][j] = (
+                        dp[i - 1][j - nums[i - 1]]
+                        or
+                        dp[i - 1][j]
+                    )
+                else:
+                    dp[i][j] = dp[i - 1][j]
+
+        return dp[n][target_sum]
+
+    def canPartition(self, nums: List[int]) -> bool:
+        n = len(nums)
+        target_sum=0
+
+        for i in range(0,n):
+            target_sum+=nums[i]
+        
+        dp = [[False] * (target_sum + 1) for _ in range(n + 1)]
+
+        
+        if target_sum%2!=0:
+            return False
+        
+        else:
+            return self.subsetSum(nums,target_sum//2,n,dp)
+
+
+        
